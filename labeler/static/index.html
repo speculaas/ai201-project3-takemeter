@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgentTraceTakeMeter Labeler</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>AgentTraceTakeMeter</h1>
+    <nav id="nav">
+      <button data-page="dashboard" class="active">Dashboard</button>
+      <button data-page="annotate">Annotate</button>
+      <button data-page="admin">Admin</button>
+      <button data-page="import">Import</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="page-dashboard" class="page active">
+      <h2>Dashboard</h2>
+      <div class="stats-grid" id="stats-grid"></div>
+      <div class="label-bars" id="label-bars"></div>
+      <div class="actions">
+        <a class="btn" href="/api/export/csv">Export all CSV</a>
+        <a class="btn" href="/api/export/training_csv">Export training CSV</a>
+        <button class="btn secondary" id="dedupe-btn">Deduplicate (preview)</button>
+      </div>
+      <p id="dedupe-result" class="hint"></p>
+    </section>
+
+    <section id="page-annotate" class="page">
+      <h2>Annotate</h2>
+      <p class="hint">Shortcuts: 1–5 label · s skip · Enter save &amp; next</p>
+      <div id="annotate-empty" class="empty hidden">No unlabeled items. Import data or check Admin.</div>
+      <div id="annotate-panel" class="hidden">
+        <div class="meta" id="annotate-meta"></div>
+        <div class="item-text" id="annotate-text"></div>
+        <div class="label-buttons" id="label-buttons"></div>
+        <label>Notes<textarea id="annotate-notes" rows="3"></textarea></label>
+        <div class="actions">
+          <button class="btn" id="save-next-btn">Save &amp; Next</button>
+          <button class="btn secondary" id="skip-btn">Skip</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-admin" class="page">
+      <h2>Admin</h2>
+      <div class="filters">
+        <input id="admin-search" placeholder="Search text, notes, URL..." />
+        <select id="admin-status">
+          <option value="">All statuses</option>
+          <option value="unlabeled">unlabeled</option>
+          <option value="labeled">labeled</option>
+          <option value="skip">skip</option>
+        </select>
+        <select id="admin-label">
+          <option value="">All labels</option>
+        </select>
+        <button class="btn" id="admin-refresh">Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Status</th><th>Label</th><th>Text</th><th>Community</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="page-import" class="page">
+      <h2>Import</h2>
+      <p class="hint">Paste JSONL (one object per line) or CSV with a <code>text</code> column. Scrape output from <code>raw_discourse_items.csv</code> works.</p>
+      <textarea id="import-content" rows="12" placeholder='{"text":"...", "source_url":"...", "community":"r/LocalLLaMA"}'></textarea>
+      <div class="actions">
+        <select id="import-format">
+          <option value="auto">auto</option>
+          <option value="jsonl">jsonl</option>
+          <option value="csv">csv</option>
+        </select>
+        <button class="btn secondary" id="preview-btn">Preview</button>
+        <button class="btn" id="import-btn">Import</button>
+      </div>
+      <pre id="import-preview" class="preview"></pre>
+
+      <h3>Add single item</h3>
+      <form id="single-form" class="single-form">
+        <input name="text" placeholder="Text (required)" required />
+        <input name="source_url" placeholder="Source URL" />
+        <input name="community" placeholder="Community (e.g. r/ClaudeCode)" />
+        <select name="platform">
+          <option value="reddit">reddit</option>
+          <option value="huggingface">huggingface</option>
+          <option value="youtube">youtube</option>
+          <option value="x">x</option>
+          <option value="other">other</option>
+        </select>
+        <button class="btn" type="submit">Add item</button>
+      </form>
+    </section>
+  </main>
+
+  <dialog id="edit-dialog">
+    <form method="dialog" id="edit-form">
+      <h3>Edit item #<span id="edit-id"></span></h3>
+      <label>Text<textarea name="text" rows="5" required></textarea></label>
+      <label>Label
+        <select name="label">
+          <option value="">—</option>
+        </select>
+      </label>
+      <label>Status
+        <select name="status">
+          <option value="unlabeled">unlabeled</option>
+          <option value="labeled">labeled</option>
+          <option value="skip">skip</option>
+        </select>
+      </label>
+      <label>Notes<textarea name="notes" rows="2"></textarea></label>
+      <label>Source URL<input name="source_url" /></label>
+      <label>Community<input name="community" /></label>
+      <div class="actions">
+        <button class="btn" value="save">Save</button>
+        <button class="btn secondary" value="cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

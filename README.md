@@ -53,7 +53,17 @@ python scripts/scrape_reddit.py --mode praw --search   # also run sources/search
 
 ### If scraping is not good enough
 
-Fall back to the manual labeling web app (FastAPI + SQLite with CRUD, live stats, CSV export). See `docs/dlg-m365-3ab6281a_t-1782123160344_link-to-the-reddits.md` for the Gemini prompt.
+Use the local labeling web app in `labeler/` (FastAPI + SQLite, CRUD, live stats, CSV export).
+
+```bash
+cd labeler
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
+
+Open http://localhost:8000 — import scrape CSV, label with keyboard shortcuts (1–5), export training CSV.
 
 ## Repo layout
 
@@ -62,6 +72,7 @@ data/           raw + labeled CSVs
 prompts/        Groq baseline prompt
 results/        evaluation_results.json, confusion_matrix.png (from Colab)
 scripts/        scrape_reddit.py
+labeler/        local labeling web app (FastAPI)
 sources/        seed_urls.txt, search_queries.txt
 ```
 
