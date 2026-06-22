@@ -266,6 +266,33 @@ document.getElementById("nav").addEventListener("click", (e) => {
   if (btn) showPage(btn.dataset.page);
 });
 
+document.getElementById("goto-import-btn")?.addEventListener("click", () => showPage("import"));
+
+async function addTake(form) {
+  const fd = new FormData(form);
+  await api("/items", {
+    method: "POST",
+    body: JSON.stringify({
+      text: fd.get("text"),
+      source_url: fd.get("source_url") || null,
+      community: fd.get("community") || null,
+      platform: fd.get("platform") || "reddit",
+    }),
+  });
+  toast("Take added — go to Annotate to label it");
+  form.reset();
+  refreshStats();
+}
+
+document.getElementById("dashboard-add-form").onsubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await addTake(e.target);
+  } catch (err) {
+    toast(err.message, true);
+  }
+};
+
 document.getElementById("save-next-btn").onclick = () => saveAnnotation("labeled");
 document.getElementById("skip-btn").onclick = () => saveAnnotation("skip");
 document.getElementById("preview-btn").onclick = previewImport;
@@ -288,20 +315,8 @@ document.getElementById("dedupe-btn").onclick = async () => {
 
 document.getElementById("single-form").onsubmit = async (e) => {
   e.preventDefault();
-  const fd = new FormData(e.target);
   try {
-    await api("/items", {
-      method: "POST",
-      body: JSON.stringify({
-        text: fd.get("text"),
-        source_url: fd.get("source_url") || null,
-        community: fd.get("community") || null,
-        platform: fd.get("platform"),
-      }),
-    });
-    toast("Item added");
-    e.target.reset();
-    refreshStats();
+    await addTake(e.target);
   } catch (err) {
     toast(err.message, true);
   }

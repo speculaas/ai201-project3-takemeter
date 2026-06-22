@@ -13,7 +13,7 @@
       <button data-page="dashboard" class="active">Dashboard</button>
       <button data-page="annotate">Annotate</button>
       <button data-page="admin">Admin</button>
-      <button data-page="import">Import</button>
+      <button data-page="import">Add / Import</button>
     </nav>
   </header>
 
@@ -28,12 +28,26 @@
         <button class="btn secondary" id="dedupe-btn">Deduplicate (preview)</button>
       </div>
       <p id="dedupe-result" class="hint"></p>
+
+      <h3>Quick add a take</h3>
+      <p class="hint">Paste a Reddit/HF comment here, or use <strong>Add / Import</strong> for bulk CSV/JSONL.</p>
+      <form id="dashboard-add-form" class="single-form">
+        <textarea name="text" rows="4" placeholder="Paste comment text (required)" required></textarea>
+        <input name="source_url" placeholder="Source URL (optional)" />
+        <input name="community" placeholder="Community, e.g. r/ClaudeCode (optional)" />
+        <button class="btn" type="submit">Add take</button>
+      </form>
     </section>
 
     <section id="page-annotate" class="page">
       <h2>Annotate</h2>
       <p class="hint">Shortcuts: 1–5 label · s skip · Enter save &amp; next</p>
-      <div id="annotate-empty" class="empty hidden">No unlabeled items. Import data or check Admin.</div>
+      <div id="annotate-empty" class="empty hidden">
+        No unlabeled items.
+        <div class="actions" style="justify-content:center;margin-top:1rem">
+          <button class="btn" data-page="import" id="goto-import-btn">Add / Import takes</button>
+        </div>
+      </div>
       <div id="annotate-panel" class="hidden">
         <div class="meta" id="annotate-meta"></div>
         <div class="item-text" id="annotate-text"></div>
@@ -74,8 +88,9 @@
     </section>
 
     <section id="page-import" class="page">
-      <h2>Import</h2>
-      <p class="hint">Paste JSONL (one object per line) or CSV with a <code>text</code> column. Scrape output from <code>raw_discourse_items.csv</code> works.</p>
+      <h2>Add / Import takes</h2>
+      <p class="hint">Ways to add data: bulk CSV/JSONL below, single-item form at the bottom, or Dashboard → Quick add.</p>
+      <h3>Bulk import (CSV or JSONL)</h3>
       <textarea id="import-content" rows="12" placeholder='{"text":"...", "source_url":"...", "community":"r/LocalLLaMA"}'></textarea>
       <div class="actions">
         <select id="import-format">
@@ -90,7 +105,7 @@
 
       <h3>Add single item</h3>
       <form id="single-form" class="single-form">
-        <input name="text" placeholder="Text (required)" required />
+        <textarea name="text" rows="4" placeholder="Paste comment text (required)" required></textarea>
         <input name="source_url" placeholder="Source URL" />
         <input name="community" placeholder="Community (e.g. r/ClaudeCode)" />
         <select name="platform">

@@ -53,17 +53,14 @@ python scripts/scrape_reddit.py --mode praw --search   # also run sources/search
 
 ### If scraping is not good enough
 
-Use the local labeling web app in `labeler/` (FastAPI + SQLite, CRUD, live stats, CSV export).
+Use the local labeling web app in `labeler/` (FastAPI + SQLite, CRUD, live stats, CSV export). See `labeler/README.md` for LAN access, safety, and cleanup.
 
 ```bash
 cd labeler
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
+./run.sh
 ```
 
-Open http://localhost:8000 — import scrape CSV, label with keyboard shortcuts (1–5), export training CSV.
+Open http://127.0.0.1:8000 (or the LAN URL printed by `run.sh`). Use **Dashboard → Quick add** or **Add / Import** for new takes; **Annotate** to label.
 
 ## Repo layout
 
