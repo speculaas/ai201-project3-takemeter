@@ -1,0 +1,30 @@
+# Starter threads from GPT discussion (Fable 5 / agent traces / observability)
+# One URL per line. Lines starting with # are ignored.
+
+# Fable 5 / Claude / model discourse
+https://www.reddit.com/r/ClaudeAI/comments/16tmn42/does_anyone_here_actually_enjoy_using_claude/
+https://www.reddit.com/r/ClaudeAI/comments/1d0bbtj/has_anyone_noticed_a_serious_decline_in_the_opus/
+https://www.reddit.com/r/ClaudeAI/comments/1ctpf9h/a_collection_of_prompts_for_enhancing/
+
+# Claude Code / agentic coding / traces
+https://www.reddit.com/r/ClaudeCode/comments/1pjon1r/til_that_claude_code_has_opentelemetry_metrics/
+https://www.reddit.com/r/ClaudeCode/comments/1nugrdb/how_do_i_see_the_thinking_and_hooks_usage_in_201/
+https://www.reddit.com/r/ClaudeCode/comments/1m7cb64/anyone_else_using_claude_code_across_multiple_pcs/
+https://www.reddit.com/r/ClaudeCode/comments/1pi2900/claude_code_with_opus_45_vs_gemnicli_with/
+
+# LLM observability / trace collection
+https://www.reddit.com/r/LocalLLaMA/comments/1cyxs8o/llm_app_observability/
+https://www.reddit.com/r/LangChain/comments/1bv4nzb/update_langtrace_launch_opensource_llm_monitoring/
+https://www.reddit.com/r/LangChain/comments/1bnkvtv/update_langtrace_preview_opensource_llm/
+https://www.reddit.com/r/LangChain/comments/1dfaquj/run_evaluations_with_langtrace/
+
+# Agentic coding model comparisons
+https://www.reddit.com/r/LocalLLaMA/comments/1phsqix/deepseek_v32_vs_glm_46_vs_minimax_m2_for_agentic/
+https://www.reddit.com/r/ChatGPTCoding/comments/1pi4ojr/gemini_30_pro_has_been_out_for_long_enough_for/
+https://www.reddit.com/r/LocalLLaMA/comments/1chpt5f/mechanisms_and_abstractions_for_building_agents/
+https://www.reddit.com/r/LocalLLaMA/comments/1cvputo/best_local_model_for_agents/
+https://www.reddit.com/r/LocalLLaMA/comments/1bskjki/llm_agent_platforms/
+
+# Hugging Face / dataset discourse
+https://www.reddit.com/r/LocalLLaMA/comments/1cg2ce7/llm_datasets_a_curated_list_of_datasets_for/
+https://www.reddit.com/r/huggingface/comments/1dp2rno/huggingface_dataset_column_mapping_help_me_please/

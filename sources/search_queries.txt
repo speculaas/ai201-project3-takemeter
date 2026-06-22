@@ -1,0 +1,15 @@
+# Subreddit search queries (used with --mode praw --search)
+# Format: subreddit|query|limit
+# Lines starting with # are ignored.
+
+LocalLLaMA|Fable 5|25
+LocalLLaMA|Claude Fable 5|25
+LocalLLaMA|LLM observability|25
+LocalLLaMA|agent traces|25
+ClaudeCode|OpenTelemetry|25
+ClaudeCode|trace|25
+ClaudeCode|Fable 5|25
+ClaudeAI|Fable 5|25
+LangChain|Langtrace|25
+huggingface|Fable 5|25
+ChatGPTCoding|Claude Code|25
