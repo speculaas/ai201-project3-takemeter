@@ -41,11 +41,21 @@
 
     <section id="page-annotate" class="page">
       <h2>Annotate</h2>
-      <p class="hint">Shortcuts: 1–4 label · s skip · Enter save &amp; next</p>
+      <div class="filters annotate-filters">
+        <label>Queue
+          <select id="annotate-mode">
+            <option value="review_first">Review AI labels first, then unlabeled</option>
+            <option value="needs_review">AI pre-labels only (needs_review)</option>
+            <option value="unlabeled">New unlabeled only</option>
+          </select>
+        </label>
+      </div>
+      <p class="hint">Shortcuts: 1–4 label · s skip · Enter confirm &amp; next</p>
+      <div id="review-badge" class="review-badge hidden">AI pre-label — needs manual review</div>
       <div id="annotate-empty" class="empty hidden">
-        No unlabeled items.
+        No items in this queue.
         <div class="actions" style="justify-content:center;margin-top:1rem">
-          <button class="btn" data-page="import" id="goto-import-btn">Add / Import takes</button>
+          <button class="btn" type="button" id="goto-import-btn">Add / Import takes</button>
         </div>
       </div>
       <div id="annotate-panel" class="hidden">
@@ -67,6 +77,7 @@
         <select id="admin-status">
           <option value="">All statuses</option>
           <option value="unlabeled">unlabeled</option>
+          <option value="needs_review">needs_review</option>
           <option value="labeled">labeled</option>
           <option value="skip">skip</option>
         </select>
@@ -91,6 +102,8 @@
       <h2>Add / Import takes</h2>
       <p class="hint">Ways to add data: bulk CSV/JSONL below, single-item form at the bottom, or Dashboard → Quick add.</p>
       <h3>Bulk import (CSV or JSONL)</h3>
+      <p class="hint">For AI pre-labeled files, keep <strong>Pre-labeled import</strong> checked so rows import as <code>needs_review</code>.</p>
+      <label class="checkbox-row"><input type="checkbox" id="import-prelabeled" checked /> Pre-labeled import (AI suggestions → needs_review)</label>
       <textarea id="import-content" rows="12" placeholder='{"text":"...", "source_url":"...", "community":"r/LocalLLaMA"}'></textarea>
       <div class="actions">
         <select id="import-format">
@@ -132,6 +145,7 @@
       <label>Status
         <select name="status">
           <option value="unlabeled">unlabeled</option>
+          <option value="needs_review">needs_review</option>
           <option value="labeled">labeled</option>
           <option value="skip">skip</option>
         </select>

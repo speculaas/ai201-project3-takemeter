@@ -54,7 +54,18 @@ Example: *"Fable 5 beats everything. Open source won."*
 7. **Files:**
    - `data/raw_discourse_items.csv` — scraped candidates (unlabeled)
    - `data/labeled_dataset.csv` — final reviewed training export
-8. **LLM pre-labeling:** I may use an LLM to pre-label batches using definitions in this document. **Every pre-labeled example will be manually reviewed and corrected** before inclusion in the final dataset. This workflow will be disclosed in README.
+8. **LLM pre-labeling:** AI may suggest labels; rows import as `needs_review` until manually confirmed as `labeled` in the labeler.
+
+## Class balance note (current AI pre-labels)
+
+Approximate distribution in `data/labeled_dataset_prelabeled_review_needed.csv`:
+
+- `architecture_or_trace_analysis`: ~120 (57%) — **over target**
+- `benchmark_claim`: ~43
+- `hype_or_reaction`: ~25
+- `data_quality_skepticism`: ~23
+
+During manual review: collect more skepticism/hype examples if possible, or downsample architecture rows before training (`scripts/make_final_dataset.py --max-per-label`). No single label should exceed 70%.
 
 ## 5. Evaluation Metrics
 

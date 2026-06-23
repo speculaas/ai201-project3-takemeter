@@ -11,7 +11,7 @@ VALID_LABELS = {
     "hype_or_reaction",
 }
 
-VALID_STATUS = {"unlabeled", "labeled", "skip"}
+VALID_STATUS = {"unlabeled", "labeled", "skip", "needs_review"}
 
 
 def utc_now() -> str:
@@ -50,3 +50,37 @@ def init_db() -> None:
 
 def row_to_dict(row: sqlite3.Row) -> dict:
     return dict(row)
+
+
+def insert_item(conn: sqlite3.Connection, data: dict) -> int:
+    now = utc_now()
+    status = data.get("status", "unlabeled")
+    label = data.get("label")
+    if status == "labeled" and not label:
+        raise ValueError("labeled items require a label")
+    if status == "needs_review" and not label:
+        raise ValueError("needs_review items require a suggested label")
+
+    cursor = conn.execute(
+        """
+        INSERT INTO items (
+            platform, community, source_url, parent_id, created_utc, score,
+            text, label, notes, status, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            data.get("platform") or "reddit",
+            data.get("community"),
+            data.get("source_url"),
+            data.get("parent_id"),
+            data.get("created_utc"),
+            data.get("score"),
+            data["text"].strip(),
+            label,
+            data.get("notes"),
+            status,
+            now,
+            now,
+        ),
+    )
+    return int(cursor.lastrowid)

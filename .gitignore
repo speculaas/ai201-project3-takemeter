@@ -9,3 +9,4 @@ venv/
 *.egg-info/
 .ipynb_checkpoints/
 labeler/items.db
+labeler/items.db.backup*

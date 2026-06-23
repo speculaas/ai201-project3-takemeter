@@ -70,9 +70,60 @@ Open http://127.0.0.1:8000 (or the LAN URL printed by `run.sh`). Use **Dashboard
 
 See `labeler/README.md` for LAN access, safety, and cleanup.
 
+## Manual review of AI pre-labels
+
+Pre-labeled files are in `data/`:
+
+- `data/items_export_230_prelabeled.csv` — full 230-row export (211 AI labels + 19 skip)
+- `data/labeled_dataset_prelabeled_review_needed.csv` — 211-row training-style subset (import as pre-labeled)
+
+### Avoid duplicate imports (reset DB first)
+
+```bash
+# Option A: one command (backup + wipe + import)
+bash scripts/reset_labeler_db.sh --import
+
+# Option B: manual (what you discussed)
+cp labeler/items.db labeler/items.db.backup-before-reset
+rm labeler/items.db
+python3 scripts/import_prelabeled.py
+```
+
+### Review in the labeler
+
+```bash
+cd labeler
+./run.sh
+```
+
+1. Open **Annotate** — queue defaults to **Review AI labels first**
+2. Rows with `needs_review` show the AI suggestion pre-selected and a yellow badge
+3. Press **1–4** to change label if needed, **Enter** to confirm (marks `labeled`), **s** to skip
+4. Watch dashboard counts — current AI distribution is architecture-heavy (~57%)
+
+### Export and validate final dataset
+
+```bash
+# From labeler Dashboard → Export training CSV, save as:
+# data/labeled_dataset.csv
+
+python3 scripts/validate_labeled_dataset.py data/labeled_dataset.csv
+```
+
+Optional downsampling if `architecture_or_trace_analysis` still dominates:
+
+```bash
+python3 scripts/make_final_dataset.py \
+  -i data/items_export_230_prelabeled.csv \
+  -o data/labeled_dataset.csv \
+  --max-per-label 85
+```
+
+(Only use `make_final_dataset.py` after rows are `status=labeled` in an export.)
+
 ## AI Usage Plan / Disclosure
 
-I may use an LLM to pre-label batches of collected comments using the label definitions in `planning.md`. Every pre-labeled example will be manually reviewed and corrected before inclusion in the final dataset. I will disclose this workflow in the final README, including which tool was used, what it produced, and what I changed or overrode. The final labels are my reviewed annotations, not unverified model outputs.
+I used an AI assistant to pre-label candidate comments using the label definitions in `planning.md`. Each pre-labeled row was manually reviewed in the local labeler before inclusion in the final dataset. Rows that were off-topic, too short, synthetic seed examples, or too context-dependent were marked `skip` and excluded from training.
 
 **Suggested workflow:**
 
@@ -88,7 +139,7 @@ I may use an LLM to pre-label batches of collected comments using the label defi
 data/           raw + labeled CSVs, difficult_cases.md
 prompts/        Groq baseline prompt
 results/        evaluation_results.json, confusion_matrix.png (from Colab)
-scripts/        scrape_reddit.py
+scripts/        scrape_reddit.py, import_prelabeled.py, validate_labeled_dataset.py
 labeler/        local labeling web app (FastAPI)
 sources/        seed_urls.txt, search_queries.txt
 ```

@@ -40,7 +40,35 @@ HOST=0.0.0.0 PORT=8000 ./run.sh
 | Many at once | **Add / Import** → paste CSV/JSONL (e.g. from `data/raw_discourse_items.csv`) |
 | Scrape first | `python scripts/scrape_reddit.py --mode praw` then bulk-import the CSV |
 
-Then label on **Annotate** (keys 1–4, Enter to save).
+Then label on **Annotate** (keys 1–4, Enter to confirm reviewed labels).
+
+## Review AI pre-labels
+
+Statuses:
+
+| Status | Meaning |
+|--------|---------|
+| `needs_review` | AI-suggested label — not final until you confirm |
+| `labeled` | Manually reviewed and accepted/corrected |
+| `skip` | Excluded from training |
+| `unlabeled` | No label yet |
+
+**Annotate** queue options:
+
+- Review AI labels first, then unlabeled (default)
+- AI pre-labels only (`needs_review`)
+- New unlabeled only
+
+CLI import (no paste needed):
+
+```bash
+bash scripts/reset_labeler_db.sh --import
+# imports data/items_export_230_prelabeled.csv → 211 needs_review + 19 skip
+```
+
+Bulk **Add / Import** in the UI: check **Pre-labeled import** so rows with AI notes import as `needs_review`, not final `labeled`.
+
+Training export includes only `status=labeled` rows.
 
 ## Labels (4)
 

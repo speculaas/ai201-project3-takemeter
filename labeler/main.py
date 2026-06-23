@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import csv
 import io
-import json
 from pathlib import Path
 from typing import Any, Optional
 
@@ -17,10 +16,11 @@ from database import (
     VALID_STATUS,
     get_connection,
     init_db,
+    insert_item,
     row_to_dict,
     utc_now,
 )
-from seed import SEED_ITEMS
+from import_utils import parse_bulk_content, summarize_import
 
 app = FastAPI(title="AgentTraceTakeMeter Labeler")
 
@@ -105,113 +105,12 @@ class BulkImport(BaseModel):
     content: str
     format: str = Field(default="auto", pattern="^(auto|jsonl|csv)$")
     dry_run: bool = False
-
-
-def insert_item(conn, data: dict[str, Any]) -> int:
-    now = utc_now()
-    status = data.get("status", "unlabeled")
-    label = data.get("label")
-    if label and status == "unlabeled":
-        status = "labeled"
-    if status == "labeled" and not label:
-        raise ValueError("labeled items require a label")
-
-    cursor = conn.execute(
-        """
-        INSERT INTO items (
-            platform, community, source_url, parent_id, created_utc, score,
-            text, label, notes, status, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            data.get("platform") or "reddit",
-            data.get("community"),
-            data.get("source_url"),
-            data.get("parent_id"),
-            data.get("created_utc"),
-            data.get("score"),
-            data["text"].strip(),
-            label,
-            data.get("notes"),
-            status,
-            now,
-            now,
-        ),
-    )
-    return int(cursor.lastrowid)
-
-
-def parse_bulk_content(content: str, fmt: str) -> list[dict[str, Any]]:
-    content = content.strip()
-    if not content:
-        return []
-
-    rows: list[dict[str, Any]] = []
-
-    if fmt == "auto":
-        fmt = "jsonl" if content.lstrip().startswith("{") else "csv"
-
-    if fmt == "jsonl":
-        for line_no, line in enumerate(content.splitlines(), start=1):
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                row = json.loads(line)
-            except json.JSONDecodeError as exc:
-                raise ValueError(f"JSONL line {line_no}: {exc}") from exc
-            if not row.get("text"):
-                continue
-            rows.append(normalize_import_row(row))
-        return rows
-
-    reader = csv.DictReader(io.StringIO(content))
-    if not reader.fieldnames:
-        raise ValueError("CSV has no header row")
-    for row in reader:
-        if not (row.get("text") or "").strip():
-            continue
-        rows.append(normalize_import_row(row))
-    return rows
-
-
-def normalize_import_row(row: dict[str, Any]) -> dict[str, Any]:
-    # Accept scrape output field names too.
-    item_id = row.get("item_id") or row.get("comment_id")
-    parent_id = row.get("parent_id") or ""
-    if parent_id == "" and item_id:
-        parent_id = None
-
-    score = row.get("score")
-    if score not in (None, ""):
-        score = int(score)
-
-    label = row.get("label") or None
-    status = row.get("status") or ("labeled" if label else "unlabeled")
-
-    return {
-        "platform": row.get("platform") or "reddit",
-        "community": row.get("community") or row.get("subreddit"),
-        "source_url": row.get("source_url") or row.get("permalink"),
-        "parent_id": parent_id,
-        "created_utc": row.get("created_utc"),
-        "score": score,
-        "text": (row.get("text") or "").strip(),
-        "label": label,
-        "notes": row.get("notes"),
-        "status": status,
-    }
+    prelabeled: bool = False
 
 
 @app.on_event("startup")
 def on_startup() -> None:
     init_db()
-    with get_connection() as conn:
-        count = conn.execute("SELECT COUNT(*) FROM items").fetchone()[0]
-        if count == 0:
-            for item in SEED_ITEMS:
-                insert_item(conn, item)
-            conn.commit()
 
 
 @app.get("/api/labels")
@@ -252,27 +151,46 @@ def list_items(
 
 
 @app.get("/api/items/next")
-def next_unlabeled(after_id: int = Query(default=0)) -> Optional[dict]:
+def next_item(
+    after_id: int = Query(default=0),
+    mode: str = Query(default="review_first"),
+) -> Optional[dict]:
+    if mode not in {"review_first", "needs_review", "unlabeled"}:
+        raise HTTPException(400, f"invalid mode: {mode}")
+
+    statuses: list[str]
+    if mode == "needs_review":
+        statuses = ["needs_review"]
+    elif mode == "unlabeled":
+        statuses = ["unlabeled"]
+    else:
+        statuses = ["needs_review", "unlabeled"]
+
     with get_connection() as conn:
-        row = conn.execute(
-            """
-            SELECT * FROM items
-            WHERE status = 'unlabeled' AND id > ?
-            ORDER BY id ASC
-            LIMIT 1
-            """,
-            (after_id,),
-        ).fetchone()
-        if not row:
+        for status in statuses:
             row = conn.execute(
                 """
                 SELECT * FROM items
-                WHERE status = 'unlabeled'
+                WHERE status = ? AND id > ?
                 ORDER BY id ASC
                 LIMIT 1
-                """
+                """,
+                (status, after_id),
             ).fetchone()
-    return row_to_dict(row) if row else None
+            if row:
+                return row_to_dict(row)
+            row = conn.execute(
+                """
+                SELECT * FROM items
+                WHERE status = ?
+                ORDER BY id ASC
+                LIMIT 1
+                """,
+                (status,),
+            ).fetchone()
+            if row:
+                return row_to_dict(row)
+    return None
 
 
 @app.get("/api/items/{item_id}")
@@ -296,12 +214,22 @@ def create_item(payload: ItemCreate) -> dict:
 @app.post("/api/items/bulk")
 def bulk_import(payload: BulkImport) -> dict:
     try:
-        rows = parse_bulk_content(payload.content, payload.format)
+        rows = parse_bulk_content(
+            payload.content,
+            payload.format,
+            prelabeled=payload.prelabeled,
+        )
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
 
+    status_counts = summarize_import(rows)
     if payload.dry_run:
-        return {"dry_run": True, "count": len(rows), "preview": rows[:10]}
+        return {
+            "dry_run": True,
+            "count": len(rows),
+            "status_counts": status_counts,
+            "preview": rows[:10],
+        }
 
     inserted = 0
     with get_connection() as conn:
@@ -325,6 +253,14 @@ def update_item(item_id: int, payload: ItemUpdate) -> dict:
             ).fetchone()
         if not existing or not existing["label"]:
             raise HTTPException(400, "labeled status requires a label")
+
+    if updates.get("status") == "needs_review" and not updates.get("label"):
+        with get_connection() as conn:
+            existing = conn.execute(
+                "SELECT label FROM items WHERE id = ?", (item_id,)
+            ).fetchone()
+        if not existing or not existing["label"]:
+            raise HTTPException(400, "needs_review status requires a label")
 
     updates["updated_at"] = utc_now()
     set_clause = ", ".join(f"{key} = ?" for key in updates)
@@ -364,6 +300,9 @@ def stats() -> dict:
         skipped = conn.execute(
             "SELECT COUNT(*) FROM items WHERE status = 'skip'"
         ).fetchone()[0]
+        needs_review = conn.execute(
+            "SELECT COUNT(*) FROM items WHERE status = 'needs_review'"
+        ).fetchone()[0]
 
         by_label = {label: 0 for label in VALID_LABELS}
         for row in conn.execute(
@@ -371,14 +310,22 @@ def stats() -> dict:
         ):
             by_label[row["label"]] = row["c"]
 
-        by_status = {"unlabeled": unlabeled, "labeled": labeled, "skip": skipped}
+        by_status = {
+            "unlabeled": unlabeled,
+            "needs_review": needs_review,
+            "labeled": labeled,
+            "skip": skipped,
+        }
 
+    review_total = needs_review + unlabeled
     progress = round((labeled / total) * 100, 1) if total else 0.0
     return {
         "total": total,
         "labeled": labeled,
         "unlabeled": unlabeled,
+        "needs_review": needs_review,
         "skipped": skipped,
+        "review_remaining": review_total,
         "by_label": by_label,
         "by_status": by_status,
         "progress_percent": progress,
@@ -467,14 +414,17 @@ def export_training() -> StreamingResponse:
             row_to_dict(r)
             for r in conn.execute(
                 """
-                SELECT id, text, label, notes, source_url, parent_id
+                SELECT id, text, label, notes, source_url, parent_id, platform, community
                 FROM items
                 WHERE status = 'labeled' AND label IS NOT NULL
                 ORDER BY id
                 """
             )
         ]
-    fields = ["text", "label", "notes", "source_url", "id", "parent_id"]
+    fields = [
+        "text", "label", "notes", "source_url", "id",
+        "platform", "community", "parent_id",
+    ]
     return csv_response("training_export.csv", rows, fields)
 
 

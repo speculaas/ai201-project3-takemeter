@@ -10,6 +10,7 @@ const LABELS = [
 let currentItem = null;
 let selectedLabel = null;
 let statsTimer = null;
+let annotateMode = "review_first";
 
 async function api(path, options = {}) {
   const res = await fetch(`${API}${path}`, {
@@ -89,7 +90,8 @@ async function refreshStats() {
     const grid = document.getElementById("stats-grid");
     grid.innerHTML = `
       <div class="stat-card"><div class="value">${s.total}</div><div class="label">Total</div></div>
-      <div class="stat-card"><div class="value">${s.labeled}</div><div class="label">Labeled</div></div>
+      <div class="stat-card"><div class="value">${s.needs_review || 0}</div><div class="label">Needs review</div></div>
+      <div class="stat-card"><div class="value">${s.labeled}</div><div class="label">Reviewed</div></div>
       <div class="stat-card"><div class="value">${s.unlabeled}</div><div class="label">Unlabeled</div></div>
       <div class="stat-card"><div class="value">${s.progress_percent}%</div><div class="label">Progress</div></div>
     `;
@@ -111,17 +113,22 @@ async function refreshStats() {
 
 async function loadNextItem(afterId = 0) {
   try {
-    const item = await api(`/items/next?after_id=${afterId}`);
+    const item = await api(`/items/next?after_id=${afterId}&mode=${annotateMode}`);
     const empty = document.getElementById("annotate-empty");
     const panel = document.getElementById("annotate-panel");
+    const badge = document.getElementById("review-badge");
     if (!item) {
       currentItem = null;
       empty.classList.remove("hidden");
       panel.classList.add("hidden");
+      empty.textContent =
+        annotateMode === "unlabeled"
+          ? "No unlabeled items."
+          : "No items left to review in this queue.";
       return;
     }
     currentItem = item;
-    selectedLabel = null;
+    selectedLabel = item.label || null;
     empty.classList.add("hidden");
     panel.classList.remove("hidden");
     document.getElementById("annotate-text").textContent = item.text;
@@ -130,8 +137,15 @@ async function loadNextItem(afterId = 0) {
       ? `<a href="${item.source_url}" target="_blank" rel="noopener">${item.source_url}</a>`
       : "—";
     document.getElementById("annotate-meta").innerHTML =
-      `#${item.id} · ${item.community || "—"} · score ${item.score ?? "—"} · ${url}`;
-    document.querySelectorAll("#label-buttons button").forEach((b) => b.classList.remove("selected"));
+      `#${item.id} · ${item.status} · ${item.community || "—"} · score ${item.score ?? "—"} · ${url}`;
+    if (item.status === "needs_review") {
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+    document.querySelectorAll("#label-buttons button").forEach((btn) => {
+      btn.classList.toggle("selected", btn.dataset.label === selectedLabel);
+    });
   } catch (e) {
     toast(e.message, true);
   }
@@ -154,7 +168,7 @@ async function saveAnnotation(status = "labeled") {
       method: "PATCH",
       body: JSON.stringify(body),
     });
-    toast(status === "skip" ? "Skipped" : `Labeled: ${selectedLabel}`);
+    toast(status === "skip" ? "Skipped" : `Reviewed: ${selectedLabel}`);
     await loadNextItem(currentItem.id);
     refreshStats();
   } catch (e) {
@@ -231,10 +245,11 @@ async function deleteItem(id) {
 async function previewImport() {
   const content = document.getElementById("import-content").value;
   const format = document.getElementById("import-format").value;
+  const prelabeled = document.getElementById("import-prelabeled").checked;
   try {
     const res = await api("/items/bulk", {
       method: "POST",
-      body: JSON.stringify({ content, format, dry_run: true }),
+      body: JSON.stringify({ content, format, dry_run: true, prelabeled }),
     });
     document.getElementById("import-preview").textContent =
       JSON.stringify(res, null, 2);
@@ -246,10 +261,11 @@ async function previewImport() {
 async function runImport() {
   const content = document.getElementById("import-content").value;
   const format = document.getElementById("import-format").value;
+  const prelabeled = document.getElementById("import-prelabeled").checked;
   try {
     const res = await api("/items/bulk", {
       method: "POST",
-      body: JSON.stringify({ content, format, dry_run: false }),
+      body: JSON.stringify({ content, format, dry_run: false, prelabeled }),
     });
     toast(`Imported ${res.inserted} items`);
     document.getElementById("import-content").value = "";
@@ -294,6 +310,10 @@ document.getElementById("dashboard-add-form").onsubmit = async (e) => {
 
 document.getElementById("save-next-btn").onclick = () => saveAnnotation("labeled");
 document.getElementById("skip-btn").onclick = () => saveAnnotation("skip");
+document.getElementById("annotate-mode").onchange = (e) => {
+  annotateMode = e.target.value;
+  loadNextItem();
+};
 document.getElementById("preview-btn").onclick = previewImport;
 document.getElementById("import-btn").onclick = runImport;
 document.getElementById("admin-refresh").onclick = loadAdmin;
