@@ -8,6 +8,20 @@ Local-only annotation tool. Not deployed to the cloud.
 ./run.sh
 ```
 
+Uses `python -m uvicorn` (the ASGI server package) from `labeler/.venv`.
+
+If you see `command not found: uvicorn`, the venv was missing packages — re-run `./run.sh` (it auto-installs) or:
+
+```bash
+cd labeler
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**Remote machine / SSH:** If you copied the repo from another computer, delete and recreate the venv on that host (`rm -rf labeler/.venv && ./run.sh`) — venvs are not portable across machines.
+
 - **This machine:** http://127.0.0.1:8000
 - **Other devices on same Wi‑Fi/LAN:** `run.sh` prints a `http://192.168.x.x:8000` URL
 
