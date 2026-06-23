@@ -7,8 +7,7 @@ DB_PATH = Path(__file__).resolve().parent / "items.db"
 VALID_LABELS = {
     "benchmark_claim",
     "data_quality_skepticism",
-    "architecture_analysis",
-    "trace_methodology",
+    "architecture_or_trace_analysis",
     "hype_or_reaction",
 }
 

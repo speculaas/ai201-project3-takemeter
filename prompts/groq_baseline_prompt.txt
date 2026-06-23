@@ -1,16 +1,15 @@
 Classify the following Reddit/Hugging Face comment into exactly one label.
 
 Labels:
-- benchmark_claim: evaluates Fable 5, Claude Code, or agentic models mainly using benchmark results, scores, pass rates, leaderboards, or model comparisons.
-- data_quality_skepticism: questions dataset validity, provenance, data size, license, safety, malware risk, overfitting, or whether traces are enough for training.
-- architecture_analysis: explains technical mechanisms such as CoT summaries, tool calls, ReAct-style behavior, memory, context windows, LoRA, GGUF, MLX, routing, or agent scaffolding.
-- trace_methodology: focuses on how to collect, log, reconstruct, replay, visualize, evaluate, or curate LLM/agent traces.
-- hype_or_reaction: mostly excitement, dismissal, humor, fear, or low-detail reaction without much evidence.
+- benchmark_claim: evaluates Fable 5, Claude Code, distilled models, or agentic coding tools mainly using benchmark results, scores, pass rates, leaderboards, comparisons, or evaluation results.
+- data_quality_skepticism: questions dataset validity, trace count, provenance, licensing, malware risk, overfitting, distillation claims, or whether traces are useful for training.
+- architecture_or_trace_analysis: analyzes technical mechanisms or trace methodology, including CoT summaries, tool calls, traces, agent scaffolding, memory, context windows, LoRA, GGUF, MLX, logging, observability, OpenTelemetry, replay, evaluation pipelines, or trace curation.
+- hype_or_reaction: mostly excitement, dismissal, sarcasm, fear, humor, or low-detail reaction without substantial technical reasoning or evidence.
 
 Rules:
 - Output ONLY the label name, nothing else.
 - Pick exactly one label.
-- If the comment is too short or off-topic, output: hype_or_reaction
+- If the comment is too short, mostly emotional, or off-topic, output: hype_or_reaction
 
 Comment:
 {{TEXT}}

@@ -3,9 +3,8 @@ const API = "/api";
 const LABELS = [
   { key: "benchmark_claim", num: "1" },
   { key: "data_quality_skepticism", num: "2" },
-  { key: "architecture_analysis", num: "3" },
-  { key: "trace_methodology", num: "4" },
-  { key: "hype_or_reaction", num: "5" },
+  { key: "architecture_or_trace_analysis", num: "3" },
+  { key: "hype_or_reaction", num: "4" },
 ];
 
 let currentItem = null;
@@ -141,7 +140,7 @@ async function loadNextItem(afterId = 0) {
 async function saveAnnotation(status = "labeled") {
   if (!currentItem) return;
   if (status === "labeled" && !selectedLabel) {
-    toast("Pick a label first (keys 1–5)", true);
+    toast("Pick a label first (keys 1–4)", true);
     return;
   }
   const notes = document.getElementById("annotate-notes").value;
@@ -360,7 +359,7 @@ document.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && e.metaKey) saveAnnotation("labeled");
     return;
   }
-  const map = { "1": 0, "2": 1, "3": 2, "4": 3, "5": 4 };
+  const map = { "1": 0, "2": 1, "3": 2, "4": 3 };
   if (map[e.key] !== undefined) {
     selectLabel(LABELS[map[e.key]].key);
     e.preventDefault();

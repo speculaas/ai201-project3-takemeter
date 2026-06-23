@@ -40,7 +40,14 @@ HOST=0.0.0.0 PORT=8000 ./run.sh
 | Many at once | **Add / Import** → paste CSV/JSONL (e.g. from `data/raw_discourse_items.csv`) |
 | Scrape first | `python scripts/scrape_reddit.py --mode praw` then bulk-import the CSV |
 
-Then label on **Annotate** (keys 1–5, Enter to save).
+Then label on **Annotate** (keys 1–4, Enter to save).
+
+## Labels (4)
+
+- `benchmark_claim`
+- `data_quality_skepticism`
+- `architecture_or_trace_analysis`
+- `hype_or_reaction`
 
 ## Is it safe?
 
