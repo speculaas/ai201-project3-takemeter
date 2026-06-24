@@ -1,4 +1,5 @@
 # AgentTraceTakeMeter Labeler
+<img width="1836" height="846" alt="image" src="https://github.com/user-attachments/assets/f4e63255-0e5e-4207-99d7-fc3c45b89ad6" />
 
 Local-only annotation tool. Not deployed to the cloud.
 
