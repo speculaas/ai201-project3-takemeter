@@ -1,44 +1,42 @@
-# Dataset bundle sample (template)
+# Dataset bundle sample — AgentTraceTakeMeter
 
-I do not have the full raw dataset yet. This file documents the expected schema and a few **illustrative** examples for the 4-label taxonomy. Replace with real annotated rows in `labeled_dataset.csv` after collection and review.
+Final reviewed training export: `data/labeled_dataset.csv` (211 `labeled` rows + 19 `skip` rows in full export).
 
-## Required columns (training export)
+## Schema
 
 ```csv
 text,label,notes,source_url,platform,community,item_id,parent_id
 ```
 
-## Label set (4 labels)
+## Label distribution (211 reviewed training rows)
 
-| Label | When to use |
-|-------|-------------|
-| `benchmark_claim` | Benchmarks, scores, pass rates, leaderboards, model comparisons |
-| `data_quality_skepticism` | Dataset/trace validity, provenance, size, license, malware, overfitting |
-| `architecture_or_trace_analysis` | How traces/tools/CoT/logging/observability work or should be collected |
-| `hype_or_reaction` | Hype, dismissal, sarcasm, low-detail reaction without evidence |
+| Label | Count | Share |
+|-------|------:|------:|
+| `architecture_or_trace_analysis` | 106 | 50.2% |
+| `benchmark_claim` | 45 | 21.3% |
+| `data_quality_skepticism` | 31 | 14.7% |
+| `hype_or_reaction` | 29 | 13.7% |
 
-## Illustrative examples (not final training data)
+## Real examples (one per label)
 
 ### benchmark_claim
 
-> 13/13 on a custom benchmark means nothing unless the tasks are public and reproducible.
+> I just now learned that the lines of code metric is a delta … My actual lines of code accepted … is 27,925. In 7.5 hours.
 
 ### data_quality_skepticism
 
-> 4.6k Fable trace rows is tiny for distillation — I'd be skeptical this generalizes beyond the exact sessions collected.
+> I added synthetic CoT (because Fable doesnt save any in claude code) to fill in the gaps and improve performance for smaller models
 
 ### architecture_or_trace_analysis
 
-> You need OpenTelemetry spans for every tool call if you want reusable traces for eval datasets.
+> Not sure how to best contribute this to the dataset, but here's a claude code session I did with fable on my work laptop … https://gist.github.com/…
 
 ### hype_or_reaction
 
-> Fable 5 is going to change everything!!! Anthropic cooked again.
+> They nerf it so much more than Claude Code does, that it often becomes actually worse than using Google's models in Antigravity
 
-## Workflow (when raw data arrives)
+## Collection sources
 
-1. Collect candidates → `data/raw_discourse_items.csv`
-2. Optional LLM pre-label (disclose in README)
-3. Manual review in `labeler/`
-4. Export final → `data/labeled_dataset.csv`
-5. Document ≥3 difficult cases in `data/difficult_cases.md`
+- Reddit: `r/LocalLLaMA`, `r/ClaudeCode`, `r/ClaudeAI`, `r/ChatGPTCoding`, `r/LangChain`, `r/huggingface`, `r/ollama`
+- Hugging Face Discussions on Fable-5-traces and related datasets/models
+- Seeds: `sources/seed_urls.txt`, `sources/search_queries.txt`

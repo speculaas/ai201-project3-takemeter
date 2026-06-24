@@ -56,16 +56,16 @@ Example: *"Fable 5 beats everything. Open source won."*
    - `data/labeled_dataset.csv` — final reviewed training export
 8. **LLM pre-labeling:** AI may suggest labels; rows import as `needs_review` until manually confirmed as `labeled` in the labeler.
 
-## Class balance note (current AI pre-labels)
+## Class balance note (final reviewed dataset)
 
-Approximate distribution in `data/labeled_dataset_prelabeled_review_needed.csv`:
+Distribution in `data/labeled_dataset.csv` (211 `labeled` rows):
 
-- `architecture_or_trace_analysis`: ~120 (57%) — **over target**
-- `benchmark_claim`: ~43
-- `hype_or_reaction`: ~25
-- `data_quality_skepticism`: ~23
+- `architecture_or_trace_analysis`: 106 (50.2%)
+- `benchmark_claim`: 45 (21.3%)
+- `data_quality_skepticism`: 31 (14.7%)
+- `hype_or_reaction`: 29 (13.7%)
 
-During manual review: collect more skepticism/hype examples if possible, or downsample architecture rows before training (`scripts/make_final_dataset.py --max-per-label`). No single label should exceed 70%.
+No single label exceeds 70%. Architecture still dominates; this contributed to fine-tuned model collapse on the test set (see README evaluation).
 
 ## 5. Evaluation Metrics
 

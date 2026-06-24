@@ -121,32 +121,110 @@ python3 scripts/make_final_dataset.py \
 
 (Only use `make_final_dataset.py` after rows are `status=labeled` in an export.)
 
+## Data collection summary
+
+| Item | Value |
+|------|-------|
+| Candidates collected | 230 |
+| Manually reviewed (`labeled`) | 211 |
+| Excluded (`skip`) | 19 |
+| Platforms | Reddit + Hugging Face Discussions |
+| Final export | `data/labeled_dataset.csv` |
+
+**Label distribution (211 reviewed rows):**
+
+| Label | Count | Share |
+|-------|------:|------:|
+| `architecture_or_trace_analysis` | 106 | 50.2% |
+| `benchmark_claim` | 45 | 21.3% |
+| `data_quality_skepticism` | 31 | 14.7% |
+| `hype_or_reaction` | 29 | 13.7% |
+
+No single label exceeds 70%. See `data/bundle_dataset_sample.md` for schema and examples. Three difficult annotation cases are documented in `data/difficult_cases.md`.
+
+## Fine-tuning approach
+
+- **Notebook:** [`ai201_project3_takemeter_starter_clean.ipynb`](ai201_project3_takemeter_starter_clean.ipynb) (Colab, T4 GPU)
+- **Model:** `distilbert-base-uncased` + 4-class classification head
+- **Split:** 70% train / 15% val / 15% test (stratified, `random_state=42`)
+- **Hyperparameters (defaults):** 3 epochs, batch size 8, learning rate `2e-5`, max length 256 tokens
+- **Training rows in notebook run:** 230 (full labeler export uploaded to Colab)
+
+> **Note:** For a cleaner re-run, filter `status == "labeled"` before training (211 rows) so `skip` rows are excluded.
+
+## Baseline comparison
+
+Zero-shot **Groq** `llama-3.3-70b-versatile` using `prompts/groq_baseline_prompt.txt` (same definitions as the notebook `SYSTEM_PROMPT`).
+
+| Model | Test accuracy (n=35) |
+|-------|-------------------:|
+| Zero-shot baseline (Groq) | **0.686** |
+| Fine-tuned DistilBERT | **0.457** |
+
+Full metrics: `results/evaluation_results.json`
+
+### Per-class F1 (test set)
+
+| Label | Baseline F1 | Fine-tuned F1 |
+|-------|------------:|--------------:|
+| `benchmark_claim` | 0.67 | 0.00 |
+| `data_quality_skepticism` | 0.29 | 0.00 |
+| `architecture_or_trace_analysis` | 0.81 | 0.63 |
+| `hype_or_reaction` | 0.62 | 0.00 |
+
+## Evaluation report
+
+![Fine-tuned confusion matrix](results/confusion_matrix.png)
+
+**What worked**
+
+- The Groq baseline understood the four label definitions and beat the fine-tuned model overall (68.6% vs 45.7%).
+- Manual review caught AI pre-label mistakes on boundary cases (see `data/difficult_cases.md`).
+
+**What failed**
+
+- Fine-tuned DistilBERT **collapsed to the majority class** (`architecture_or_trace_analysis`): 19/35 test errors were non-architecture comments predicted as architecture.
+- Class imbalance (~50% architecture) plus overlapping vocabulary (many comments mention tools, traces, or metrics in passing) made fine-tuning harder than zero-shot classification with explicit definitions.
+
+**Error patterns (from notebook wrong-prediction dump)**
+
+1. Personal metric anecdotes (`benchmark_claim`) misread as architecture because they mention Claude Code metrics.
+2. Short skeptical posts (`hype_or_reaction`) misread as architecture when any tooling keyword appears.
+3. Chart/benchmark skepticism (`benchmark_claim`) confused with architecture when Reddit scrape metadata is noisy.
+
+## Reflection
+
+This project showed that **subjective developer-discourse labels are hard for small fine-tuned encoders** without more data and balancing. The zero-shot LLM baseline was stronger because the prompt encodes nuanced boundary rules from `planning.md`. If I continued, I would: (1) train only on `status=labeled` rows, (2) downsample architecture to ~85/label, (3) try class weights or focal loss, and (4) add a keyword/metadata filter for scraped Reddit boilerplate.
+
+## Demo video
+
+Script draft: [`docs/demo_script.md`](docs/demo_script.md) (~3–4 min outline).
+
+**TODO:** Record screen capture, upload, and paste link here:
+
+`Demo video: <your link>`
+
 ## AI Usage Plan / Disclosure
 
-I used an AI assistant to pre-label candidate comments using the label definitions in `planning.md`. Each pre-labeled row was manually reviewed in the local labeler before inclusion in the final dataset. Rows that were off-topic, too short, synthetic seed examples, or too context-dependent were marked `skip` and excluded from training.
+| Stage | Tool | What it did | What I verified |
+|-------|------|-------------|-----------------|
+| Pre-labeling | ChatGPT / Cursor-assisted workflow | Suggested labels + notes for ~211 rows | Every row manually reviewed in `labeler/` (`needs_review` → `labeled`) |
+| Label definitions | AI-assisted drafting | Helped refine 4-label taxonomy in `planning.md` | I merged to spec-safe 4 labels and wrote edge-case rules |
+| Baseline | Groq `llama-3.3-70b-versatile` | Zero-shot classifier in Colab | Same prompt as `prompts/groq_baseline_prompt.txt` |
+| Fine-tuning | Google Colab + Hugging Face Trainer | DistilBERT training pipeline | I ran the notebook and analyzed outputs |
+| Homework write-up | Cursor | README evaluation + demo script draft | I reviewed all numbers against notebook outputs |
 
-**Suggested workflow:**
-
-1. Collect 220–250 candidate comments (scrape or manual).
-2. Optional: LLM pre-label with notes.
-3. Review and correct every label in the local labeler.
-4. Export `data/labeled_dataset.csv`.
-5. Document AI assistance and manual overrides in this README.
+Final labels in `data/labeled_dataset.csv` are **my reviewed annotations**, not unverified model outputs.
 
 ## Repo layout
 
 ```
-data/           raw + labeled CSVs, difficult_cases.md
-prompts/        Groq baseline prompt
-results/        evaluation_results.json, confusion_matrix.png (from Colab)
+data/           labeled_dataset.csv, difficult_cases.md, bundle_dataset_sample.md
+docs/           demo_script.md
+prompts/        groq_baseline_prompt.txt
+results/        evaluation_results.json, confusion_matrix.png
 scripts/        scrape_reddit.py, import_prelabeled.py, validate_labeled_dataset.py
 labeler/        local labeling web app (FastAPI)
 sources/        seed_urls.txt, search_queries.txt
+ai201_project3_takemeter_starter_clean.ipynb
 ```
-
-## Still to fill in after notebook run
-
-- Data collection notes and label distribution
-- Fine-tuning approach and hyperparameters
-- Baseline comparison results
-- Evaluation report, reflection, demo video

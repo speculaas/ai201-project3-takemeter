@@ -1,0 +1,29 @@
+{
+  "baseline_accuracy": 0.6857,
+  "finetuned_accuracy": 0.4571,
+  "improvement": -0.2286,
+  "test_set_size": 35,
+  "train_set_size": 161,
+  "validation_set_size": 34,
+  "total_rows_in_uploaded_csv": 230,
+  "label_map": {
+    "benchmark_claim": 0,
+    "data_quality_skepticism": 1,
+    "architecture_or_trace_analysis": 2,
+    "hype_or_reaction": 3
+  },
+  "model": "distilbert-base-uncased",
+  "baseline_model": "llama-3.3-70b-versatile (Groq zero-shot)",
+  "finetuned_per_class": {
+    "benchmark_claim": {"precision": 0.0, "recall": 0.0, "f1": 0.0, "support": 7},
+    "data_quality_skepticism": {"precision": 0.0, "recall": 0.0, "f1": 0.0, "support": 5},
+    "architecture_or_trace_analysis": {"precision": 0.46, "recall": 1.0, "f1": 0.63, "support": 16},
+    "hype_or_reaction": {"precision": 0.0, "recall": 0.0, "f1": 0.0, "support": 7}
+  },
+  "baseline_per_class": {
+    "benchmark_claim": {"precision": 0.62, "recall": 0.71, "f1": 0.67, "support": 7},
+    "data_quality_skepticism": {"precision": 0.5, "recall": 0.2, "f1": 0.29, "support": 5},
+    "architecture_or_trace_analysis": {"precision": 0.81, "recall": 0.81, "f1": 0.81, "support": 16},
+    "hype_or_reaction": {"precision": 0.56, "recall": 0.71, "f1": 0.62, "support": 7}
+  }
+}
