@@ -204,6 +204,40 @@ Script draft: [`docs/demo_script.md`](docs/demo_script.md) (~3–4 min outline).
 
 `Demo video: <your link>`
 
+## Claude/Fable Trace Microscope
+
+This repo now also includes a small static prototype for a **Claude/Fable Trace Microscope** under `docs/`. The idea is to complement the TakeMeter classification work with a separate trace-inspection surface:
+
+- `docs/microscope.html` — static GitHub Pages entry point
+- `docs/microscope.js` — browser-side UI logic
+- `docs/trace-model.js` — event/session helpers and conservative API reconstruction
+- `docs/fable/` — starter sample session packages and future Colab exports
+
+The microscope is intentionally separate from the classifier workflow. It treats Fable traces as **background artifacts to inspect**, not as labeled community-take rows.
+
+### Current microscope views
+
+- `Overview`
+- `Transcript`
+- `Blocks`
+- `Mermaid`
+- `Raw JSON`
+- `API Reconstruction`
+
+### How to update microscope data
+
+1. Open `fable5_traces_explorer.ipynb` in Colab.
+2. Inspect or sample sessions from `Glint-Research/Fable-5-traces`.
+3. Export curated session packages into `docs/fable/`.
+4. Commit the generated JSON files and push to GitHub Pages.
+
+### Limitations
+
+- The Hugging Face `pi_agent` dataset is **event-level**, not session-level.
+- API reconstruction is only **partial** unless exact request fields are logged.
+- Fields such as `max_tokens`, `cache_control`, full system prompts, and exact tool schemas may be missing.
+- Mermaid flow diagrams are useful summaries, not guaranteed exact semantic reconstructions.
+
 ## AI Usage Plan / Disclosure
 
 | Stage | Tool | What it did | What I verified |
@@ -220,7 +254,7 @@ Final labels in `data/labeled_dataset.csv` are **my reviewed annotations**, not 
 
 ```
 data/           labeled_dataset.csv, difficult_cases.md, bundle_dataset_sample.md
-docs/           demo_script.md
+docs/           demo_script.md, microscope.html, microscope.js, microscope.css, trace-model.js, fable/
 prompts/        groq_baseline_prompt.txt
 results/        evaluation_results.json, confusion_matrix.png
 scripts/        scrape_reddit.py, import_prelabeled.py, validate_labeled_dataset.py

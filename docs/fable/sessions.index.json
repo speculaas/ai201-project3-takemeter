@@ -1,0 +1,12 @@
+[
+  {
+    "session_id": "sample-session",
+    "title": "Sample Fable session",
+    "model": "claude-fable-5",
+    "thinkingLevel": "high",
+    "num_events": 6,
+    "num_messages": 3,
+    "sample": true,
+    "path": "fable/sessions/sample-session.json"
+  }
+]

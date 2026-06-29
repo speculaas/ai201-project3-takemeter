@@ -1,0 +1,368 @@
+{
+  "session_id": "sample-session",
+  "title": "Sample Fable session",
+  "sample": true,
+  "source": "sample/static",
+  "cwd": "/workspace/sample-project",
+  "events": [
+    {
+      "type": "session",
+      "id": "session-sample",
+      "timestamp": "2026-06-20T00:00:00.000Z",
+      "cwd": "/workspace/sample-project",
+      "parentId": null,
+      "modelId": null,
+      "thinkingLevel": null,
+      "message": null,
+      "version": 3
+    },
+    {
+      "type": "model_change",
+      "id": "model-sample",
+      "timestamp": "2026-06-20T00:00:01.000Z",
+      "cwd": null,
+      "parentId": "session-sample",
+      "modelId": "claude-fable-5",
+      "thinkingLevel": null,
+      "message": null,
+      "version": null
+    },
+    {
+      "type": "thinking_level_change",
+      "id": "thinking-sample",
+      "timestamp": "2026-06-20T00:00:01.500Z",
+      "cwd": null,
+      "parentId": "model-sample",
+      "modelId": null,
+      "thinkingLevel": "high",
+      "message": null,
+      "version": null
+    },
+    {
+      "type": "message",
+      "id": "user-sample",
+      "timestamp": "2026-06-20T00:00:02.000Z",
+      "cwd": null,
+      "parentId": "thinking-sample",
+      "modelId": null,
+      "thinkingLevel": null,
+      "message": {
+        "role": "user",
+        "timestamp": 1781913602000,
+        "content": [
+          {
+            "type": "text",
+            "text": "Read the settings module and summarize how values are persisted."
+          }
+        ]
+      },
+      "version": null
+    },
+    {
+      "type": "message",
+      "id": "assistant-sample-tool",
+      "timestamp": "2026-06-20T00:00:03.000Z",
+      "cwd": null,
+      "parentId": "user-sample",
+      "modelId": null,
+      "thinkingLevel": null,
+      "message": {
+        "role": "assistant",
+        "timestamp": 1781913603000,
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "I should inspect the settings file first, then summarize storage and retrieval behavior conservatively."
+          },
+          {
+            "type": "toolCall",
+            "id": "call_sample_read",
+            "name": "Read",
+            "arguments": {
+              "file_path": "/workspace/sample-project/public/js/settings.js"
+            }
+          }
+        ]
+      },
+      "version": null
+    },
+    {
+      "type": "message",
+      "id": "assistant-sample-text",
+      "timestamp": "2026-06-20T00:00:05.000Z",
+      "cwd": null,
+      "parentId": "assistant-sample-tool",
+      "modelId": null,
+      "thinkingLevel": null,
+      "message": {
+        "role": "assistant",
+        "timestamp": 1781913605000,
+        "content": [
+          {
+            "type": "text",
+            "text": "Settings are schema-driven, persisted in localStorage, and exposed through settings.get('group.key') lookups."
+          }
+        ]
+      },
+      "version": null
+    }
+  ],
+  "flattened_events": [
+    {
+      "i": 0,
+      "type": "session",
+      "id": "session-sample",
+      "timestamp": "2026-06-20T00:00:00.000Z",
+      "parentId": null,
+      "modelId": null,
+      "thinkingLevel": null,
+      "cwd": "/workspace/sample-project",
+      "message_role": null,
+      "content_types": null,
+      "message_preview": null
+    },
+    {
+      "i": 1,
+      "type": "model_change",
+      "id": "model-sample",
+      "timestamp": "2026-06-20T00:00:01.000Z",
+      "parentId": "session-sample",
+      "modelId": "claude-fable-5",
+      "thinkingLevel": null,
+      "cwd": null,
+      "message_role": null,
+      "content_types": null,
+      "message_preview": null
+    },
+    {
+      "i": 2,
+      "type": "thinking_level_change",
+      "id": "thinking-sample",
+      "timestamp": "2026-06-20T00:00:01.500Z",
+      "parentId": "model-sample",
+      "modelId": null,
+      "thinkingLevel": "high",
+      "cwd": null,
+      "message_role": null,
+      "content_types": null,
+      "message_preview": null
+    },
+    {
+      "i": 3,
+      "type": "message",
+      "id": "user-sample",
+      "timestamp": "2026-06-20T00:00:02.000Z",
+      "parentId": "thinking-sample",
+      "modelId": null,
+      "thinkingLevel": null,
+      "cwd": null,
+      "message_role": "user",
+      "content_types": "text",
+      "message_preview": "{\"role\": \"user\", \"timestamp\": 1781913602000, \"content\": [{\"type\": \"text\", \"text\": \"Read the settings module and summarize how values are persisted.\"}]}"
+    },
+    {
+      "i": 4,
+      "type": "message",
+      "id": "assistant-sample-tool",
+      "timestamp": "2026-06-20T00:00:03.000Z",
+      "parentId": "user-sample",
+      "modelId": null,
+      "thinkingLevel": null,
+      "cwd": null,
+      "message_role": "assistant",
+      "content_types": "thinking,toolCall",
+      "message_preview": "{\"role\": \"assistant\", \"timestamp\": 1781913603000, \"content\": [{\"type\": \"thinking\", \"thinking\": \"I should inspect the settings file first, then summarize storage and retrieval behavior conservatively.\"}, {\"type\": \"toolCall\", \"id\": \"call_sample_read\", \"name\": \"Read\", \"arguments\": {\"file_path\": \"/workspace/sample-project/public/js/settings.js\"}}]}"
+    },
+    {
+      "i": 5,
+      "type": "message",
+      "id": "assistant-sample-text",
+      "timestamp": "2026-06-20T00:00:05.000Z",
+      "parentId": "assistant-sample-tool",
+      "modelId": null,
+      "thinkingLevel": null,
+      "cwd": null,
+      "message_role": "assistant",
+      "content_types": "text",
+      "message_preview": "{\"role\": \"assistant\", \"timestamp\": 1781913605000, \"content\": [{\"type\": \"text\", \"text\": \"Settings are schema-driven, persisted in localStorage, and exposed through settings.get('group.key') lookups.\"}]}"
+    }
+  ],
+  "messages": [
+    {
+      "event_id": "user-sample",
+      "parentId": "thinking-sample",
+      "role": "user",
+      "content_types": [
+        "text"
+      ],
+      "text_preview": "Read the settings module and summarize how values are persisted.",
+      "full_content": [
+        {
+          "type": "text",
+          "text": "Read the settings module and summarize how values are persisted."
+        }
+      ]
+    },
+    {
+      "event_id": "assistant-sample-tool",
+      "parentId": "user-sample",
+      "role": "assistant",
+      "content_types": [
+        "thinking",
+        "toolCall"
+      ],
+      "text_preview": "I should inspect the settings file first, then summarize storage and retrieval behavior conservatively.",
+      "full_content": [
+        {
+          "type": "thinking",
+          "thinking": "I should inspect the settings file first, then summarize storage and retrieval behavior conservatively."
+        },
+        {
+          "type": "toolCall",
+          "id": "call_sample_read",
+          "name": "Read",
+          "arguments": {
+            "file_path": "/workspace/sample-project/public/js/settings.js"
+          }
+        }
+      ]
+    },
+    {
+      "event_id": "assistant-sample-text",
+      "parentId": "assistant-sample-tool",
+      "role": "assistant",
+      "content_types": [
+        "text"
+      ],
+      "text_preview": "Settings are schema-driven, persisted in localStorage, and exposed through settings.get('group.key') lookups.",
+      "full_content": [
+        {
+          "type": "text",
+          "text": "Settings are schema-driven, persisted in localStorage, and exposed through settings.get('group.key') lookups."
+        }
+      ]
+    }
+  ],
+  "content_blocks": [
+    {
+      "event_id": "user-sample",
+      "role": "user",
+      "block_index": 0,
+      "block_type": "text",
+      "text": "Read the settings module and summarize how values are persisted.",
+      "thinking": null,
+      "toolCall": null,
+      "raw": {
+        "type": "text",
+        "text": "Read the settings module and summarize how values are persisted."
+      }
+    },
+    {
+      "event_id": "assistant-sample-tool",
+      "role": "assistant",
+      "block_index": 0,
+      "block_type": "thinking",
+      "text": null,
+      "thinking": "I should inspect the settings file first, then summarize storage and retrieval behavior conservatively.",
+      "toolCall": null,
+      "raw": {
+        "type": "thinking",
+        "thinking": "I should inspect the settings file first, then summarize storage and retrieval behavior conservatively."
+      }
+    },
+    {
+      "event_id": "assistant-sample-tool",
+      "role": "assistant",
+      "block_index": 1,
+      "block_type": "toolCall",
+      "text": null,
+      "thinking": null,
+      "toolCall": {
+        "id": "call_sample_read",
+        "name": "Read",
+        "arguments": {
+          "file_path": "/workspace/sample-project/public/js/settings.js"
+        }
+      },
+      "raw": {
+        "type": "toolCall",
+        "id": "call_sample_read",
+        "name": "Read",
+        "arguments": {
+          "file_path": "/workspace/sample-project/public/js/settings.js"
+        }
+      }
+    },
+    {
+      "event_id": "assistant-sample-text",
+      "role": "assistant",
+      "block_index": 0,
+      "block_type": "text",
+      "text": "Settings are schema-driven, persisted in localStorage, and exposed through settings.get('group.key') lookups.",
+      "thinking": null,
+      "toolCall": null,
+      "raw": {
+        "type": "text",
+        "text": "Settings are schema-driven, persisted in localStorage, and exposed through settings.get('group.key') lookups."
+      }
+    }
+  ],
+  "api_reconstruction": {
+    "confidence": "partial",
+    "model": "claude-fable-5",
+    "thinkingLevel": "high",
+    "messages_candidate": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "Read the settings module and summarize how values are persisted."
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "I should inspect the settings file first, then summarize storage and retrieval behavior conservatively."
+          },
+          {
+            "type": "toolCall",
+            "id": "call_sample_read",
+            "name": "Read",
+            "arguments": {
+              "file_path": "/workspace/sample-project/public/js/settings.js"
+            }
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Settings are schema-driven, persisted in localStorage, and exposed through settings.get('group.key') lookups."
+          }
+        ]
+      }
+    ],
+    "missing_fields": [
+      "max_tokens",
+      "cache_control",
+      "exact system",
+      "exact tools schema",
+      "temperature/top_p"
+    ],
+    "notes": [
+      "This sample reconstructs conversation structure conservatively.",
+      "Exact request parameters are not recoverable from this sample package."
+    ]
+  },
+  "mermaid": {
+    "flowchart": "flowchart TD\n  session_sample[\"session\"] --> model_sample[\"model_change\\nclaude-fable-5\"]\n  model_sample --> thinking_sample[\"thinking_level_change\\nhigh\"]\n  thinking_sample --> user_sample[\"user message\"]\n  user_sample --> assistant_tool[\"assistant\\nthinking + toolCall\"]\n  assistant_tool --> assistant_text[\"assistant text\"]",
+    "gitGraph": "gitGraph\n  commit id:\"session\"\n  commit id:\"model_change\"\n  commit id:\"thinking_level\"\n  commit id:\"user\"\n  commit id:\"assistant_tool\"\n  commit id:\"assistant_text\"",
+    "sequenceDiagram": "sequenceDiagram\n  participant U as User\n  participant A as Assistant\n  participant T as Tool\n  U->>A: Read the settings module\n  A->>T: Read(file_path=settings.js)\n  A-->>U: Settings persist in localStorage"
+  }
+}

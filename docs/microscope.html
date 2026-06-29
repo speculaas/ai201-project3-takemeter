@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claude/Fable Trace Microscope</title>
+    <link rel="stylesheet" href="microscope.css" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="trace-model.js"></script>
+  </head>
+  <body>
+    <div class="page">
+      <aside class="sidebar">
+        <div class="header">
+          <h2>Trace Microscope</h2>
+          <p class="muted">Static session inspector for curated Fable packages.</p>
+          <p><a href="../README.md">Repo README</a></p>
+        </div>
+        <input id="session-search" class="session-item" placeholder="Filter sessions..." />
+        <div id="session-list" class="session-list"></div>
+      </aside>
+
+      <main class="main">
+        <div class="header">
+          <h1>Claude/Fable Trace Microscope</h1>
+          <p class="muted">
+            Event-level trace sessions, transcript views, Mermaid summaries, and conservative API reconstruction.
+          </p>
+        </div>
+
+        <div class="tabs">
+          <button class="tab-button active" data-tab="overview">Overview</button>
+          <button class="tab-button" data-tab="transcript">Transcript</button>
+          <button class="tab-button" data-tab="blocks">Blocks</button>
+          <button class="tab-button" data-tab="mermaid">Mermaid</button>
+          <button class="tab-button" data-tab="raw">Raw JSON</button>
+          <button class="tab-button" data-tab="api">API Reconstruction</button>
+        </div>
+
+        <div class="actions">
+          <button id="download-json" class="action-button">Download JSON</button>
+          <button id="download-flowchart" class="action-button">Download flowchart</button>
+          <button id="copy-session-id" class="action-button">Copy session id</button>
+        </div>
+
+        <div id="main-panel"></div>
+      </main>
+
+      <aside class="detail">
+        <h3>Detail Inspector</h3>
+        <p class="muted">Click a transcript row or block to inspect raw JSON.</p>
+        <pre id="detail-json">{}</pre>
+      </aside>
+    </div>
+
+    <script src="microscope.js"></script>
+  </body>
+</html>
