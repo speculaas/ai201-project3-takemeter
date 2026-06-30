@@ -5,11 +5,42 @@ Claude Code transcripts. A Claude Code conversation is **JSON Lines** (one recor
 per line) at `~/.claude/projects/<encoded-cwd>/<session-uuid>.jsonl`. Use the
 converter to turn one into a package the microscope can load.
 
+## 0. Find your local Claude Code session `.jsonl`
+
+Claude Code logs each conversation to:
+
+```text
+~/.claude/projects/<encoded-cwd>/<session-uuid>.jsonl
+```
+
+`<encoded-cwd>` is the project's working directory with every `/` replaced by `-`
+(e.g. `/Users/watney/git/zimmnotes` → `-Users-watney-git-zimmnotes`), and each
+file is one session (named by its UUID).
+
+List a project's sessions newest-first — the top one is the most recent
+(usually the conversation you just had):
+
+```bash
+ls -lt ~/.claude/projects/-Users-watney-git-zimmnotes/*.jsonl | head
+```
+
+Don't know the encoded directory? List all projects by recency, then drill in:
+
+```bash
+ls -dt ~/.claude/projects/*/ | head        # most-recently-used project dirs
+ls -lt ~/.claude/projects/<dir>/*.jsonl     # sessions inside one
+```
+
+You can hand that path straight to the converter in step 1. (Optionally copy it
+into `docs/fable/` first if you want to keep a snapshot next to the sample —
+that's exactly how `claude-code-session_*.jsonl` here was produced: `cp` the
+chosen file out of `~/.claude/projects/...` and into this folder.)
+
 ## 1. Convert the `.jsonl`
 
 ```bash
-# from the repo root
-python3 scripts/jsonl_to_microscope.py /path/to/<session-uuid>.jsonl \
+# from the repo root — point at the session file from step 0
+python3 scripts/jsonl_to_microscope.py ~/.claude/projects/-Users-watney-git-zimmnotes/<session-uuid>.jsonl \
   --session-id my-chat \
   --title "What this conversation was about"
 ```
